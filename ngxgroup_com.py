@@ -1103,10 +1103,31 @@ class Handler(Extract, GetPages):
             'summary': {
                 'currency': 'naira',
                 'balance_sheet': {
-                    'market_capitalization': self.api['MarketCap']
+                    'market_capitalization': str(self.api['MarketCap'])
                 }
             }
         }]
+        self.get_working_tree_api(f'https://ngxgroup.com/exchange/data/company-profile/?isin={self.api["InternationSecIN"]}&directory=companydirectory','tree')
+
+        res = []
+        dates = self.tree.xpath('//h3/text()[contains(., "Last 7 Days Trades")]/../../following-sibling::div[1]//tr/td[1]/text()')[:-1]
+        prices =self.tree.xpath('//h3/text()[contains(., "Last 7 Days Trades")]/../../following-sibling::div[1]//tr/td[2]/text()')[:-1]
+        volumes = self.tree.xpath('//h3/text()[contains(., "Last 7 Days Trades")]/../../following-sibling::div[1]//tr/td[3]/text()')[:-1]
+        prPrices = prices[1:]
+
+        for d,p,v, pr in zip(dates, prices, volumes, prPrices):
+            res.append(
+                {
+                    'data_date': datetime.datetime.strftime(datetime.datetime.today(), '%Y-%m-%d'),
+                    'open_price': pr,
+                    'close_price': p,
+                    'volume': v,
+                    'day_range': f'{pr}-{p}',
+                }
+            )
+        fin['stocks_information'].append({'historical_prices': res})
+
+
         return fin
 
 
