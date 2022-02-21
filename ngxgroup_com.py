@@ -161,9 +161,11 @@ class Handler(Extract, GetPages):
                 pass
             try:
                 street = addr.split('Street')
+                # print(street)
                 if len(street) == 2:
                     temp['streetAddress'] = street[0] + 'Street'
-                temp['streetAddress'] = addr.split(',')[0]
+                else:
+                    temp['streetAddress'] = addr.split(',')[0]
 
 
                 # if temp['streetAddress']:
