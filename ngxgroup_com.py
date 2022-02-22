@@ -515,8 +515,13 @@ class Handler(Extract, GetPages):
 
     def get_overview(self, link_name):
         self.overview = {}
-        self.api = link_name
-        print(link_name)
+
+        if type(link_name) == dict:
+            self.api = link_name
+        else:
+            link_name = link_name.replace("'", '"').replace("None", '"None"')
+            self.api = json.loads(link_name)
+        # print(link_name)
         # self.get_working_tree_api(link_name, 'tree')
         #self.check_tree()
         try:
@@ -553,7 +558,7 @@ class Handler(Extract, GetPages):
 
         self.get_address(key='CompanyAddress')
 
-        self.overview['hasIPODate'] = self.api['DateListed'] if self.api['DateListed'] else '1970-01-01'
+        self.overview['hasIPODate'] = self.api['DateListed'].split('T')[0] if self.api['DateListed'] else '1970-01-01'
 
         self.fillField('isIncorporatedIn',
                        key='DateOfIncorporation')
